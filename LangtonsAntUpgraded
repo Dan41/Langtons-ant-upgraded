@@ -17,8 +17,6 @@ public class LangtonsAntUpgraded extends Application {
 	
 	private Random rand = new Random();
 	
-	private Color[] colors = {Color.GREEN, Color.RED, Color.BLUE, Color.ORANGE, Color.LIGHTGREEN, Color.FUCHSIA, Color.AQUA};
-	
 	Pane root = new Pane();
 	
 	private Parent create() {
@@ -34,7 +32,7 @@ public class LangtonsAntUpgraded extends Application {
 		///////RANDOM LOCATIONS///////
 		for (int i = 0; i < 50; i++) {
 			Ant ant = new Ant(rand.nextInt(500)*2, rand.nextInt(350)*2, 2, 2);
-			new MoveAnt().move(ant, colors[rand.nextInt(7)], rand.nextInt(4));
+			new MoveAnt().move(ant, randColor(), rand.nextInt(4));
 		}
 		
 		//////ONE ANT//////
@@ -43,18 +41,28 @@ public class LangtonsAntUpgraded extends Application {
 		
 		///////PATTERNS///////
 		/*Ant ant1 = new Ant(500, 150, 2, 2);
-		new MoveAnt().move(ant1, colors[rand.nextInt(7)], 3);
+		new MoveAnt().move(ant1, randColor(), 3);
 		
 		Ant ant2 = new Ant(300, 350, 2, 2);
-		new MoveAnt().move(ant2, colors[rand.nextInt(7)], 2);
+		new MoveAnt().move(ant2, randColor(), 2);
 		
 		Ant ant3 = new Ant(500, 550, 2, 2);
-		new MoveAnt().move(ant3, colors[rand.nextInt(7)], 1);
+		new MoveAnt().move(ant3, randColor(), 1);
 		
 		Ant ant4 = new Ant(700, 350, 2, 2);
-		new MoveAnt().move(ant4, colors[rand.nextInt(7)], 0);*/
+		new MoveAnt().move(ant4, randColor(), 0);*/
 		
 		return root;
+	}
+	
+	private Color randColor() {
+		float r = rand.nextFloat();
+		float g = rand.nextFloat();
+		float b = rand.nextFloat();
+		
+		Color color = Color.color(r, g, b);
+		
+		return color;
 	}
 	
 	public class Ant {
