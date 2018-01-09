@@ -1,0 +1,125 @@
+package javaFX;
+
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+
+public class LangtonsAntUpgraded extends Application {
+	
+	private enum Dir {
+		UP, RIGHT, DOWN, LEFT;
+	}
+	
+	Dir dir = Dir.UP;
+	
+	private Grid[][] grid = new Grid[1000][700];
+	
+	Pane root = new Pane();
+	
+	private Parent create() {
+		root.setPrefSize(1000, 700);
+		
+		for (int i = 0; i < 1000; i++) {
+			for (int j = 0; j < 700; j++) {
+				Grid path = new Grid(i, j, 1, 1);
+				grid[i][j] = path;
+			}
+		}
+		
+		Ant ant1 = new Ant(500, 350, 1, 1);
+		move(ant1);
+		
+		return root;
+	}
+	
+	private class Ant {
+		Rectangle ant;
+		public Ant(int x, int y, int w, int h) {
+			ant = new Rectangle(w, h);
+			ant.setX(x);
+			ant.setY(y);
+			
+			root.getChildren().add(ant);
+		}
+	}
+	
+	private class Grid {
+		Rectangle rect;
+		boolean state = false;
+		public Grid(int x, int y, int w, int h) {
+			rect = new Rectangle(w, h);
+			rect.setX(x);
+			rect.setY(y);
+			rect.setFill(Color.WHITE);
+			
+			root.getChildren().add(rect);
+		}
+	}
+	
+	private void move(Ant ant) {
+		AnimationTimer antMove = new AnimationTimer() {
+			public void handle(long now) {
+				if (grid[(int) ant.ant.getX()][(int) ant.ant.getY()].state == false) {
+					grid[(int) ant.ant.getX()][(int) ant.ant.getY()].state = true;
+					grid[(int) ant.ant.getX()][(int) ant.ant.getY()].rect.setFill(Color.BLACK);
+					
+					switch(dir) {
+						case UP : dir = Dir.RIGHT;
+							break;
+						case RIGHT : dir = Dir.DOWN;
+							break;
+						case DOWN : dir = Dir.LEFT;
+							break;
+						case LEFT : dir = Dir.UP;
+							break;
+					}
+					
+				}
+				else {
+					grid[(int) ant.ant.getX()][(int) ant.ant.getY()].state = false;
+					grid[(int) ant.ant.getX()][(int) ant.ant.getY()].rect.setFill(Color.WHITE);
+					
+					switch(dir) {
+						case UP : dir = Dir.LEFT;
+							break;
+						case RIGHT : dir = Dir.UP;
+							break;
+						case DOWN : dir = Dir.RIGHT;
+							break;
+						case LEFT : dir = Dir.DOWN;
+							break;
+					}
+					
+				}
+				switch(dir) {
+					case UP : ant.ant.setY(ant.ant.getY() - ant.ant.getHeight());
+						break;
+					case RIGHT : ant.ant.setX(ant.ant.getX() + ant.ant.getWidth());
+						break;
+					case DOWN : ant.ant.setY(ant.ant.getY() + ant.ant.getHeight());
+						break;
+					case LEFT : ant.ant.setX(ant.ant.getX() - ant.ant.getWidth());
+						break;
+				}
+			}
+		};
+		antMove.start();
+	}
+
+	@Override
+	public void start(Stage stage) throws Exception {
+		stage.setTitle("Langton's ant");
+		stage.setScene(new Scene(create()));
+		stage.show();
+	}
+	
+	public static void main(String[] args) {
+		launch(args);
+	}
+
+}
