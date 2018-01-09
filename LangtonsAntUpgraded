@@ -1,4 +1,6 @@
-package javaFX;
+package langtonsAntStuff;
+
+import java.util.Random;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -11,33 +13,51 @@ import javafx.stage.Stage;
 
 public class LangtonsAntUpgraded extends Application {
 	
-	private enum Dir {
-		UP, RIGHT, DOWN, LEFT;
-	}
+	private Grid[][] grid = new Grid[500][350];
 	
-	Dir dir = Dir.UP;
+	private Random rand = new Random();
 	
-	private Grid[][] grid = new Grid[1000][700];
+	private Color[] colors = {Color.GREEN, Color.RED, Color.BLUE, Color.ORANGE, Color.LIGHTGREEN, Color.FUCHSIA, Color.AQUA};
 	
 	Pane root = new Pane();
 	
 	private Parent create() {
 		root.setPrefSize(1000, 700);
 		
-		for (int i = 0; i < 1000; i++) {
-			for (int j = 0; j < 700; j++) {
-				Grid path = new Grid(i, j, 1, 1);
+		for (int i = 0; i < 500; i++) {
+			for (int j = 0; j < 350; j++) {
+				Grid path = new Grid(i*2, j*2, 2, 2);
 				grid[i][j] = path;
 			}
 		}
 		
-		Ant ant1 = new Ant(500, 350, 1, 1);
-		move(ant1);
+		///////RANDOM LOCATIONS///////
+		for (int i = 0; i < 50; i++) {
+			Ant ant = new Ant(rand.nextInt(500)*2, rand.nextInt(350)*2, 2, 2);
+			new MoveAnt().move(ant, colors[rand.nextInt(7)], rand.nextInt(4));
+		}
+		
+		//////ONE ANT//////
+		//Ant ant = new Ant(500, 350, 2, 2);
+		//new MoveAnt().move(ant, Color.BLACK, 3);
+		
+		///////PATTERNS///////
+		/*Ant ant1 = new Ant(500, 150, 2, 2);
+		new MoveAnt().move(ant1, colors[rand.nextInt(7)], 3);
+		
+		Ant ant2 = new Ant(300, 350, 2, 2);
+		new MoveAnt().move(ant2, colors[rand.nextInt(7)], 2);
+		
+		Ant ant3 = new Ant(500, 550, 2, 2);
+		new MoveAnt().move(ant3, colors[rand.nextInt(7)], 1);
+		
+		Ant ant4 = new Ant(700, 350, 2, 2);
+		new MoveAnt().move(ant4, colors[rand.nextInt(7)], 0);*/
 		
 		return root;
 	}
 	
-	private class Ant {
+	public class Ant {
 		Rectangle ant;
 		public Ant(int x, int y, int w, int h) {
 			ant = new Rectangle(w, h);
@@ -48,7 +68,7 @@ public class LangtonsAntUpgraded extends Application {
 		}
 	}
 	
-	private class Grid {
+	public class Grid {
 		Rectangle rect;
 		boolean state = false;
 		public Grid(int x, int y, int w, int h) {
@@ -61,60 +81,90 @@ public class LangtonsAntUpgraded extends Application {
 		}
 	}
 	
-	private void move(Ant ant) {
-		AnimationTimer antMove = new AnimationTimer() {
-			public void handle(long now) {
-				if (grid[(int) ant.ant.getX()][(int) ant.ant.getY()].state == false) {
-					grid[(int) ant.ant.getX()][(int) ant.ant.getY()].state = true;
-					grid[(int) ant.ant.getX()][(int) ant.ant.getY()].rect.setFill(Color.BLACK);
-					
-					switch(dir) {
-						case UP : dir = Dir.RIGHT;
-							break;
-						case RIGHT : dir = Dir.DOWN;
-							break;
-						case DOWN : dir = Dir.LEFT;
-							break;
-						case LEFT : dir = Dir.UP;
-							break;
+	public class MoveAnt {
+		
+		final int UP = 0;
+		final int RIGHT = 1;
+		final int DOWN = 2;
+		final int LEFT = 3;
+		
+		private int dir;
+		
+		private void move(Ant ant, Color color, int direction) {
+			dir = direction;
+			AnimationTimer antMove = new AnimationTimer() {
+				public void handle(long now) {
+					for (int i = 0; i < 10; i++) {
+						if (grid[(int) ant.ant.getX() / 2][(int) ant.ant.getY() / 2].state == false) {
+							grid[(int) ant.ant.getX() / 2][(int) ant.ant.getY() / 2].state = true;
+							grid[(int) ant.ant.getX() / 2][(int) ant.ant.getY() / 2].rect.setFill(color);
+							
+							switch(dir) {
+								case UP : dir = RIGHT;
+									break;
+								case RIGHT : dir = DOWN;
+									break;
+								case DOWN : dir = LEFT;
+									break;
+								case LEFT : dir = UP;
+									break;
+							}
+							
+						}
+						else {
+							grid[(int) ant.ant.getX() / 2][(int) ant.ant.getY() / 2].state = false;
+							grid[(int) ant.ant.getX() / 2][(int) ant.ant.getY() / 2].rect.setFill(Color.WHITE);
+							
+							switch(dir) {
+								case UP : dir = LEFT;
+									break;
+								case RIGHT : dir = UP;
+									break;
+								case DOWN : dir = RIGHT;
+									break;
+								case LEFT : dir = DOWN;
+									break;
+							}
+							
+						}
+						
+						if (ant.ant.getX() == root.getWidth() - ant.ant.getWidth() && dir == RIGHT) {
+							ant.ant.setX(0);
+						}
+						else if (ant.ant.getX() == 0 && dir == LEFT) {
+							ant.ant.setX(root.getWidth() - ant.ant.getWidth());
+						}
+						else if (ant.ant.getY() == root.getHeight() - ant.ant.getHeight() && dir == DOWN) {
+							ant.ant.setY(0);
+						}
+						else if (ant.ant.getY() == 0 && dir == UP) {
+							ant.ant.setY(root.getHeight() - ant.ant.getHeight());
+						}
+						else {
+							switch(dir) {
+								case UP : ant.ant.setY(ant.ant.getY() - ant.ant.getHeight());
+									break;
+								case RIGHT : ant.ant.setX(ant.ant.getX() + ant.ant.getWidth());
+									break;
+								case DOWN : ant.ant.setY(ant.ant.getY() + ant.ant.getHeight());
+									break;
+								case LEFT : ant.ant.setX(ant.ant.getX() - ant.ant.getWidth());
+									break;
+							}
+						}
 					}
-					
 				}
-				else {
-					grid[(int) ant.ant.getX()][(int) ant.ant.getY()].state = false;
-					grid[(int) ant.ant.getX()][(int) ant.ant.getY()].rect.setFill(Color.WHITE);
-					
-					switch(dir) {
-						case UP : dir = Dir.LEFT;
-							break;
-						case RIGHT : dir = Dir.UP;
-							break;
-						case DOWN : dir = Dir.RIGHT;
-							break;
-						case LEFT : dir = Dir.DOWN;
-							break;
-					}
-					
-				}
-				switch(dir) {
-					case UP : ant.ant.setY(ant.ant.getY() - ant.ant.getHeight());
-						break;
-					case RIGHT : ant.ant.setX(ant.ant.getX() + ant.ant.getWidth());
-						break;
-					case DOWN : ant.ant.setY(ant.ant.getY() + ant.ant.getHeight());
-						break;
-					case LEFT : ant.ant.setX(ant.ant.getX() - ant.ant.getWidth());
-						break;
-				}
-			}
-		};
-		antMove.start();
+			};
+			antMove.start();
+		}
 	}
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		Scene scene = new Scene(create());
+		stage.setScene(scene);
+		
 		stage.setTitle("Langton's ant");
-		stage.setScene(new Scene(create()));
 		stage.show();
 	}
 	
