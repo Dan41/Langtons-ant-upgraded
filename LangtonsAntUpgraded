@@ -172,7 +172,6 @@ public class LangtonsAntUpgraded extends Application {
 		Scene scene = new Scene(create());
 		stage.setScene(scene);
 		
-		stage.setResizable(false);
 		stage.setTitle("Langton's ant");
 		stage.show();
 	}
